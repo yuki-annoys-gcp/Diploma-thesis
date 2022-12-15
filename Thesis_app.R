@@ -48,7 +48,7 @@ credentials <-read.csv("user_data.csv")
 
 #code here
 df<-read.csv("user_data.csv")
-header <- dashboardHeader( title = "inzynierka v 1.0", uiOutput("logoutbtn"))
+header <- dashboardHeader( title = "Thesis app v 1.1", uiOutput("logoutbtn"))
 
 sidebar <- dashboardSidebar(uiOutput("sidebarpanel")) 
 body <- dashboardBody(shinyjs::useShinyjs(), uiOutput("body"))
@@ -209,9 +209,9 @@ server <- function(input, output, session) {
       Date <- tmp$Index
       Historical_data <- tmp$Data
       Forecast_data <- tmp$`Point Forecast`
-      chrumcio<-ggplot() + geom_line(aes(x=Date,y=Historical_data),color='black') + geom_line(aes(x=Date,y=Forecast_data),color='blue') +
+      plot_arima<-ggplot() + geom_line(aes(x=Date,y=Historical_data),color='black') + geom_line(aes(x=Date,y=Forecast_data),color='blue') +
       ylab('Values')+xlab('date') 
-      ggplotly(chrumcio)
+      ggplotly(plot_arima)
     }
   })
   output$instr1 <- renderText({
@@ -226,6 +226,12 @@ server <- function(input, output, session) {
   })
   output$instr3 <- renderText({
     paste("Choose how many days into the future do you want your preditcion to be!")
+  })
+  output$instr_prophet <- renderText({
+    paste("Below is the Prophet predictions presented in the form of a graph")
+  })
+  output$instr_arima <- renderText({
+    paste("Below is the ARIMA predictions presented in the form of a graph")
   })
   output$logoutbtn <- renderUI({
     req(USER$login)
@@ -309,7 +315,9 @@ server <- function(input, output, session) {
             DT::dataTableOutput("contents"),
             actionButton("do_model", " Click Me to generate your prohet model ! "),
             actionButton("do_model_arima", " Click Me to generate your arima model ! "),
+            textOutput("instr_prophet"),
             dygraphOutput("plot1"),
+            textOutput("instr_arima"),
             plotlyOutput("plot2"),
             downloadButton("download_prophet", "Download Prophet model"),
             downloadButton("download_arima", "Download Arima model")
